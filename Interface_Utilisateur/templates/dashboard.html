@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Résultats Alumni</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.datatables.net/1.11.6/css/jquery.dataTables.css"
+    />
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: #f8f9fa;
+        margin: 20px;
+      }
+
+      h1 {
+        color: #007bff;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .container {
+        background-color: #ffffff;
+        border: 1px solid #ced4da;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+        border: 1px solid #007bff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Résultats Alumni</h1>
+
+      <div class="row">
+        <!-- Graphique en secteurs -->
+        <div class="col-md-6">
+          <img
+            src="data:image/png;base64,{{ img_base64 }}"
+            alt="Graphique en secteurs"
+          />
+        </div>
+
+        <!-- Résultats tabulaires -->
+        <div class="col-md-6">
+          <div id="resultats">
+            <label for="selectContinent">Filtrer par continent:</label>
+            <select id="selectContinent" class="form-control">
+              <option value="">Tous les continents</option>
+              <option value="Afrique">Afrique</option>
+              <option value="Europe">Europe</option>
+            </select>
+
+            <table id="tableResultats" class="table table-striped">
+              {{ resultats_html | safe }}
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.8/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script
+      type="text/javascript"
+      charset="utf8"
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      charset="utf8"
+      src="https://cdn.datatables.net/1.11.6/js/jquery.dataTables.js"
+    ></script>
+    <script>
+      $(document).ready(function () {
+        var table = $("#tableResultats").DataTable();
+
+        $("#selectContinent").on("change", function () {
+          var selectedContinent = $(this).val();
+          table.columns(1).search(selectedContinent).draw();
+        });
+      });
+    </script>
+  </body>
+</html>
