@@ -1,15 +1,31 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 import boto3
-from io import BytesIO
 import dash
-from dash import dcc, html
+from dash import dcc, html, dash_table
 from dash.dependencies import Input, Output
 import plotly.express as px
+import pycountry_convert as pc
 
 # Load the CSV file
 alumni_file_path = r'C:\Users\frup00090927\Code File\Code-File\Data\Annuaire Alumni ABC  - Annuaire Alumni ABC.csv'
 alumni_df = pd.read_csv(alumni_file_path)
+
+# Définir une fonction pour obtenir le continent à partir du code ISO du pays
+def get_continent(country):
+    try:
+        country_code = pc.country_name_to_country_alpha2(country, cn_name_format="default")
+        continent_code = pc.country_alpha2_to_continent_code(country_code)
+        continent_name = pc.convert_continent_code_to_continent_name(continent_code)
+        return continent_name
+    except:
+        return 'Inconnu'
+
+# Appliquer la fonction pour obtenir le continent pour chaque entreprise
+alumni_df['Continent'] = alumni_df['Pays de résidence'].apply(get_continent)
+
+def update_emails(continent_selected):
+    emails_df = alumni_df[alumni_df['Continent'] == continent_selected][['Nom', 'Prénom', 'Entreprises', 'Email']]
+    return emails_df.to_dict('records')
 
 # Connect to S3 and load the CSV files
 s3 = boto3.client('s3', aws_access_key_id='AKIARG7HIT7FMVUA4GNO', aws_secret_access_key='IUiphTmli4ebUNmfxl9g0s/j6Xw5uvm8E1vSr/W+')
@@ -41,8 +57,6 @@ filtered_df2['Pôle souhaité'] = filtered_df2['Pôle souhaité'].replace('Rése
 # Count the occurrences of Pôle souhaité for each file
 pole_counts1 = filtered_df1['Pôle souhaité'].value_counts()
 pole_counts2 = filtered_df2['Pôle souhaité'].value_counts()
-
-
 
 # Dash App
 app = dash.Dash(__name__)
@@ -135,14 +149,37 @@ tab3_layout = html.Div([
     ]),
 ])
 
-# Define the layout of the app
+# Ajouter la table avec callback
 app.layout = html.Div([
     dcc.Tabs([
         dcc.Tab(label='Alumni Analysis', children=tab1_layout),
         dcc.Tab(label='Data Comparison', children=tab2_layout),
         dcc.Tab(label='Candidatures Analysis', children=tab3_layout),
+        dcc.Tab(label='Alumni ABC', children=[
+            html.H1('Table by Continent'),
+            dcc.Dropdown(
+                id='dropdown-continent-table',
+                options=[{'label': continent, 'value': continent} for continent in alumni_df['Continent'].unique()],
+                value=alumni_df['Continent'].unique()[0]
+            ),
+            html.Div([
+                dash_table.DataTable(
+                    id='table-emails',
+                    columns=[{"name": i, "id": i} for i in ['Nom', 'Prénom', 'Entreprises', 'Email']],
+                    page_size=10
+                )
+            ]),
+        ])
     ])
 ])
+
+# Callback pour mettre à jour la table en fonction du continent sélectionné
+@app.callback(
+    Output('table-emails', 'data'),
+    [Input('dropdown-continent-table', 'value')]
+)
+def update_table_emails(continent_selected):
+    return update_emails(continent_selected)
 
 if __name__ == '__main__':
     app.run_server(debug=True)

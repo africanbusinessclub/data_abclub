@@ -34,7 +34,7 @@ plt.ylabel('Count')
 plt.title('Catégorie des invites')
 plt.legend()
 
-# Save the plot as an image
-plt.savefig('DataComparaisonpy D.png')
+# # Save the plot as an image
+# plt.savefig('DataComparaisonpy D.png')
 
-plt.show()
+# plt.show()

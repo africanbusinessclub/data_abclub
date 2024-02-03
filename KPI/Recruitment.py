@@ -40,8 +40,8 @@ plt.title('Candidatures 2022-2023')
 plt.xlabel('Pôle souhaité')
 plt.ylabel('Count')
 
-# Save the plot as an image
-plt.savefig('candidatures.png')
+# # Save the plot as an image
+# plt.savefig('candidatures.png')
 
-plt.tight_layout()
-plt.show()
+# plt.tight_layout()
+# plt.show()

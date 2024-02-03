@@ -98,23 +98,7 @@ def dashboard():
             resultats_df = pd.concat([resultats_df, pd.DataFrame({'Entreprise': [entreprise], 'Continent': ['Europe'], 'Emails': [emails_europe]})], ignore_index=True)
 
 
-        #Spécifier le chemin du dossier Data du drive
-        chemin_dossier = r'G:\Drive partagés\Général 2023-2024\Pôle IT & Data Management\Data\Résultats_Stats'
-        # Enregistrer le DataFrame dans un fichier Excel
-        nom_fichier_excel = fr'\Cordonnées_alumni_entreprises.xlsx'
-        chemin_fichier_excel = chemin_dossier + nom_fichier_excel
-
-        with pd.ExcelWriter(chemin_fichier_excel, engine='openpyxl') as writer:
-        # Enregistrer le DataFrame dans une feuille nommée 'Resultats'
-            resultats_df.to_excel(writer, index=False, sheet_name='Resultats')
-
-            # Ajouter une feuille 'Description' avec une description du fichier
-            description_sheet = writer.book.create_sheet('Description')
-            description_sheet['A1'] = 'Description du fichier Excel'
-            description_sheet['A2'] = 'Ce fichier contient les résultats de la recherche des entreprises en Afrique et en Europe.'
-
-        print(f"Fichier Excel enregistré : {chemin_fichier_excel}")
-        # Convertir le DataFrame en HTML
+  
         resultats_html = resultats_df.to_html(classes='table table-striped', index=False)
 
         return render_template('dashboard.html', resultats_html=resultats_html,img_base64=img_base64)
